@@ -2,12 +2,12 @@ package reactivemongo.bson
 package derived
 
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.Checkers
 
 import scala.util.{Failure, Try}
 
-class DerivedCodecsSuite extends FunSuite with Checkers {
+class DerivedCodecsSuite extends AnyFunSuite with Checkers {
 
   // Stolen from http://github.com/travisbrown/circe
   sealed trait RecursiveAdtExample
@@ -18,9 +18,10 @@ class DerivedCodecsSuite extends FunSuite with Checkers {
 
   private def atDepth(depth: Int): Gen[RecursiveAdtExample] = if (depth < 3)
     Gen.oneOf(
-      Arbitrary.arbitrary[String].map(BaseAdtExample(_)),
-      atDepth(depth + 1).map(NestedAdtExample(_))
-    ) else Arbitrary.arbitrary[String].map(BaseAdtExample(_))
+      Arbitrary.arbitrary[String].map(BaseAdtExample),
+      atDepth(depth + 1).map(NestedAdtExample)
+    )
+  else Arbitrary.arbitrary[String].map(BaseAdtExample)
 
   implicit val arbitraryRecursiveAdtExample: Arbitrary[RecursiveAdtExample] =
     Arbitrary(atDepth(0))
@@ -31,8 +32,9 @@ class DerivedCodecsSuite extends FunSuite with Checkers {
 
   test("decoding failure raises a meaningful error message") {
     Try(adtCodec.read(BSONDocument())) match {
-      case Failure(t) if t.getMessage == "Unable to decode one of NestedAdtExample, BaseAdtExample" =>
-      case _ => fail()
+      case Failure(t) if t.getMessage == "Unable to decode coproduct" =>
+      case _ =>
+        fail()
     }
   }
 

@@ -2,27 +2,33 @@ name := "reactivemongo-derived-codecs"
 
 organization := "org.julienrf"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.13.8"
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.12.17", "2.13.8")
 
 libraryDependencies ++= Seq(
-  "com.chuusai" %% "shapeless" % "2.3.2",
-  "org.reactivemongo" %% "reactivemongo-bson" % "0.12.2" % Provided,
-  "org.julienrf" %% "enum-labels" % "3.1",
-  "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-  "org.scalatest" %% "scalatest" % "3.0.3" % Test
+  "com.chuusai" %% "shapeless" % "2.4.0-M1",
+  "org.reactivemongo" %% "reactivemongo-bson" % "0.20.13" % Provided,
+  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
+  "org.scalatestplus" %% "scalacheck-1-17" % "3.2.14.0" % Test,
 )
+
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full)
+addCompilerPlugin("io.tryp" % "splain" % "1.0.0" cross CrossVersion.patch)
+
+javaOptions += "-Xms2g -Xmx3g -Xss4m"
 
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8",
   "-feature",
+  "-language:higherKinds,implicitConversions",
   "-unchecked",
-  "-Yno-adapted-args",
+  //"-Yno-adapted-args",
   "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Xfuture"
+  "-Ywarn-numeric-widen"
+  //"-Xfuture"
 )
 
 scalacOptions in (Compile, doc) ++= Seq(
@@ -79,3 +85,5 @@ releaseProcess := Seq[ReleaseStep](
   ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
   pushChanges
 )
+
+Global / onChangedBuildSource := ReloadOnSourceChanges

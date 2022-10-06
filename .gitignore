@@ -1,1 +1,8 @@
 target/
+.history
+.metals
+.vscode
+.bsp
+.idea
+.bloop
+metals.sbt
